@@ -60,10 +60,19 @@ async function getRecommendedVideo() {
       const randomIndex = Math.floor(Math.random() * data.items.length);
       const video = data.items[randomIndex];
       const videoLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
+      const videoThumbnail = `https://img.youtube.com/vi/${video.id.videoId}/hqdefault.jpg`;
 
-      // 본문에 아이콘 포함
+      // 본문에 썸네일과 링크 포함
       const iconHtml = `<img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="icon" width="18" height="18">`;
-      const body = `${iconHtml} 오늘의 추천 영상:\n\n[${video.snippet.title}](${videoLink})\n\n${video.snippet.description}`;
+      const body = `
+${iconHtml} 오늘의 추천 영상:
+
+<img src="${videoThumbnail}" alt="YouTube Thumbnail" width="320" height="180">
+
+[${video.snippet.title}](${videoLink})
+
+${video.snippet.description}
+      `;
       await createGitHubIssue("오늘의 LG 트윈스 추천 영상", body);
     } else {
       console.log("LG 트윈스 하이라이트 영상을 찾을 수 없습니다.");
