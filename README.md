@@ -49,8 +49,8 @@ GH_TOKEN=your_personal_access_token
 YOUTUBE_API_KEY=your_youtube_api_key
 ```
 
-- **`GH_TOKEN`**: GitHub Personal Access Token ([생성 가이드](https://github.com/settings/tokens)).
-- **`YOUTUBE_API_KEY`**: YouTube Data API v3 키 ([생성 가이드](https://console.cloud.google.com/)).
+- **`GH_TOKEN`**: GitHub Personal Access Token.
+- **`YOUTUBE_API_KEY`**: YouTube Data API v3 키.
 
 <br>
 
@@ -71,7 +71,7 @@ node index.js
 
 #### GitHub Actions 설정 확인:
 
-`workflow.yaml` 파일:
+`main.yaml` 파일:
 
 ```yaml
 on:
