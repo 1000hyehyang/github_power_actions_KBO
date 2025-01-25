@@ -94,6 +94,8 @@ async function getRecommendedVideo() {
     if (allItems.size > 0) {
       // 랜덤으로 하나의 영상 선택
       const allVideosArray = Array.from(allItems);
+      console.log("모든 영상 데이터:", Array.from(allItems));
+
       const randomIndex = Math.floor(Math.random() * allVideosArray.length);
       const video = allVideosArray[randomIndex];
       const videoLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
