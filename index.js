@@ -38,7 +38,7 @@ async function getRecommendedVideo() {
   const publishedAfter = yesterday.toISOString();
 
   // YouTube API 요청 URL
-  const query = `LG 트윈스 하이라이트`;
+  const query = `LG 트윈스`;
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
     query
   )}&order=date&maxResults=5&publishedAfter=${publishedAfter}&key=${YOUTUBE_API_KEY}`;
