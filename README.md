@@ -85,9 +85,25 @@ on:
 
 ### **1. 추천 영상 검색**
 
-- YouTube API를 사용하여 **"LG 트윈스 ${today}"** 쿼리로 검색.
-- 검색 결과가 없을 경우, 기본 쿼리 **"LG 트윈스 하이라이트"**로 대체.
-- 최신순으로 정렬(`order=date`)하며, 최대 50개의 결과를 가져옴.
+- YouTube API를 사용해 다음 쿼리를 반복 실행하여 검색 결과를 수집
+
+```
+LG 트윈스 ${today}
+LG 트윈스 하이라이트
+LG 트윈스 명장면
+LG 트윈스 최신 경기
+```
+
+- 검색 결과가 없는 경우를 대비해 여러 대체 쿼리를 순차적으로 실행.
+
+- 날짜 범위 확장
+  - 검색 결과를 더 풍부하게 하기 위해 일주일 전부터 오늘까지의 영상을 검색
+
+```javascript
+const lastWeek = new Date();
+lastWeek.setDate(lastWeek.getDate() - 7); // 일주일 전
+const publishedAfter = lastWeek.toISOString();
+```
 
 ### **2. 다중 페이지 검색**
 
