@@ -1,7 +1,3 @@
-아래는 요청하신 프로젝트의 **기술 README** 초안입니다. 이 README는 프로젝트의 목적, 설치 방법, 사용 방법, 기여 방법 등을 자세히 설명합니다. 필요에 따라 수정하거나 확장하실 수 있습니다.
-
----
-
 # **LG 트윈스 추천 영상 자동화 스크립트**
 
 ![Logo](https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg)
