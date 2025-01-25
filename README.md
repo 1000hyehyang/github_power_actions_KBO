@@ -1,6 +1,6 @@
 # **LG 트윈스 추천 영상 자동화 스크립트**
-
-![Logo](https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg)
+<br>
+<p align="center"> <img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="Logo" width="120" height="120"> </p>
 
 ## 📌 **프로젝트 개요**
 
@@ -10,7 +10,7 @@
 - 검색된 영상 중 랜덤으로 하나를 선택하여 GitHub Issues에 게시합니다.
 - GitHub Actions를 사용하여 매일 정해진 시간에 자동으로 실행됩니다.
 
----
+<br>
 
 ## 🛠 **기술 스택**
 
@@ -19,7 +19,7 @@
 - **GitHub REST API**: GitHub Issues 생성.
 - **GitHub Actions**: 스케줄링 및 자동화.
 
----
+<br>
 
 ## 🚀 **설치 및 실행**
 
@@ -48,7 +48,7 @@ YOUTUBE_API_KEY=your_youtube_api_key
 - **`GH_TOKEN`**: GitHub Personal Access Token ([생성 가이드](https://github.com/settings/tokens)).
 - **`YOUTUBE_API_KEY`**: YouTube Data API v3 키 ([생성 가이드](https://console.cloud.google.com/)).
 
----
+<br>
 
 ## 📋 **사용 방법**
 
@@ -75,7 +75,7 @@ on:
     - cron: "0 12 * * *" # 매일 정오에 실행
 ```
 
----
+<br>
 
 ## 💡 **기능 설명**
 
@@ -99,8 +99,7 @@ on:
 
   오늘 경기의 주요 장면을 확인하세요!
   ```
-
----
+<br>
 
 ## 🔧 **기여 방법**
 
@@ -125,7 +124,7 @@ on:
    ```
 4. Pull Request 생성.
 
----
+<br>
 
 ## 📅 **스케줄 설정 변경**
 
@@ -139,7 +138,7 @@ on:
     - cron: "0 3 * * *" # UTC 기준으로 오전 3시 = KST 정오
   ```
 
----
+<br>
 
 ## 📝 **문제 해결**
 
@@ -153,7 +152,7 @@ on:
      - 필요한 권한: `repo`, `write:issues`.
    - GitHub Secrets에 올바른 값이 저장되었는지 확인하세요.
 
----
+<br>
 
 ## 📎 **참고 자료**
 
