@@ -30,39 +30,76 @@ async function createGitHubIssue(title, body) {
   }
 }
 
-// 추천 영상 가져오기
+// 추천 영상 가져오기 (nextPageToken 활용 및 검색 쿼리 개선)
 async function getRecommendedVideo() {
   const today = new Date().toISOString().split("T")[0]; // 오늘 날짜
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1); // 어제 날짜
   const publishedAfter = yesterday.toISOString();
 
-  // YouTube API 요청 URL
-  const query = `LG 트윈스`;
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-    query
-  )}&order=date&maxResults=5&publishedAfter=${publishedAfter}&key=${YOUTUBE_API_KEY}`;
-  console.log(`YouTube API 요청 URL: ${url}`);
+  const baseQuery = `LG 트윈스 하이라이트`;
+  const specificQuery = `LG 트윈스 ${today}`; // 오늘 날짜 포함 쿼리
+
+  const baseUrl = (query) =>
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+      query
+    )}&order=date&maxResults=50&publishedAfter=${publishedAfter}&key=${YOUTUBE_API_KEY}`;
+
+  let nextPageToken = null;
+  let allItems = new Set(); // 중복 결과 방지
+
+  // API 요청 로직
+  async function fetchVideos(query) {
+    do {
+      const url = nextPageToken
+        ? `${baseUrl(query)}&pageToken=${nextPageToken}`
+        : baseUrl(query);
+      console.log(`YouTube API 요청 URL: ${url}`);
+
+      const response = await fetch(url);
+      console.log(`YouTube API 응답 상태 코드: ${response.status}`);
+
+      if (!response.ok) {
+        throw new Error(`YouTube API 요청 실패: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("YouTube API 응답 데이터:", data);
+
+      if (data.items && data.items.length > 0) {
+        data.items.forEach((item) => {
+          // 중복 확인 후 추가
+          const videoId = item.id.videoId;
+          if (videoId && !allItems.has(videoId)) {
+            allItems.add(item);
+          }
+        });
+      }
+
+      nextPageToken = data.nextPageToken || null; // 다음 페이지 토큰 갱신
+    } while (nextPageToken);
+  }
 
   try {
-    const response = await fetch(url);
-    console.log(`YouTube API 응답 상태 코드: ${response.status}`);
+    // 1. 구체적인 쿼리 시도
+    console.log("구체적인 쿼리 시도:", specificQuery);
+    await fetchVideos(specificQuery);
 
-    if (!response.ok) {
-      throw new Error(`YouTube API 요청 실패: ${response.statusText}`);
+    // 2. 검색 결과가 부족하면 기본 쿼리 시도
+    if (allItems.size === 0) {
+      console.log("기본 쿼리로 대체 시도:", baseQuery);
+      await fetchVideos(baseQuery);
     }
 
-    const data = await response.json();
-    console.log("YouTube API 응답 데이터:", data);
-
-    if (data.items && data.items.length > 0) {
-      // 랜덤으로 영상 선택
-      const randomIndex = Math.floor(Math.random() * data.items.length);
-      const video = data.items[randomIndex];
+    if (allItems.size > 0) {
+      // 랜덤으로 하나의 영상 선택
+      const allVideosArray = Array.from(allItems);
+      const randomIndex = Math.floor(Math.random() * allVideosArray.length);
+      const video = allVideosArray[randomIndex];
       const videoLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
       const videoThumbnail = `https://img.youtube.com/vi/${video.id.videoId}/hqdefault.jpg`;
 
-      // 본문에 썸네일과 링크 포함
+      // 본문 구성
       const iconHtml = `<img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="icon" width="18" height="18">`;
       const body = `
 ${iconHtml} 오늘의 추천 영상:
@@ -75,7 +112,7 @@ ${video.snippet.description}
       `;
       await createGitHubIssue("오늘의 LG 트윈스 추천 영상", body);
     } else {
-      console.log("LG 트윈스 하이라이트 영상을 찾을 수 없습니다.");
+      console.log("LG 트윈스 관련 하이라이트 영상을 찾을 수 없습니다.");
     }
   } catch (error) {
     console.error(`추천 영상 가져오기 실패: ${error.message}`);
