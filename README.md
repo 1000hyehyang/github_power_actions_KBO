@@ -1,21 +1,25 @@
 # **LG 트윈스 추천 영상 자동화 스크립트**
+
+<p align="center">
+  <img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="Logo" width="120" height="120">
+</p>
+
 <br>
-<p align="center"> <img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="Logo" width="120" height="120"> </p>
 
 ## 📌 **프로젝트 개요**
 
-이 프로젝트는 **LG 트윈스와 관련된 YouTube 추천 영상을 매일 자동으로 검색**하고, **GitHub Issues**에 추천 영상을 게시하는 자동화 스크립트입니다.
+이 프로젝트는 **LG 트윈스 관련 YouTube 하이라이트 영상을 자동으로 검색**하고, **GitHub Issues**에 매일 추천 영상을 게시하는 자동화 스크립트입니다.
 
-- YouTube API를 활용하여 최신 추천 영상을 검색합니다.
-- 검색된 영상 중 랜덤으로 하나를 선택하여 GitHub Issues에 게시합니다.
-- GitHub Actions를 사용하여 매일 정해진 시간에 자동으로 실행됩니다.
+- 최신 YouTube 영상을 검색하여 매일 **랜덤 추천**.
+- **YouTube Data API**를 활용해 여러 페이지의 검색 결과를 가져옵니다.
+- **GitHub Actions**를 사용해 매일 정해진 시간에 스크립트를 자동 실행합니다.
 
 <br>
 
 ## 🛠 **기술 스택**
 
 - **Node.js**: 스크립트 실행.
-- **YouTube Data API v3**: 추천 영상 검색.
+- **YouTube Data API v3**: 하이라이트 영상 검색.
 - **GitHub REST API**: GitHub Issues 생성.
 - **GitHub Actions**: 스케줄링 및 자동화.
 
@@ -81,24 +85,35 @@ on:
 
 ### **1. 추천 영상 검색**
 
-- YouTube API를 사용하여 "LG 트윈스"를 검색합니다.
-- 검색된 영상 중 랜덤으로 하나를 선택합니다.
+- YouTube API를 사용하여 **"LG 트윈스 ${today}"** 쿼리로 검색.
+- 검색 결과가 없을 경우, 기본 쿼리 **"LG 트윈스 하이라이트"**로 대체.
+- 최신순으로 정렬(`order=date`)하며, 최대 50개의 결과를 가져옴.
 
-### **2. GitHub Issues 생성**
+### **2. 다중 페이지 검색**
+
+- YouTube API의 **`nextPageToken`**을 활용해 한 번의 요청으로 가져올 수 없는 **50개 이상의 결과를 페이징 처리**하여 수집.
+
+### **3. 중복 방지**
+
+- 중복된 영상(`videoId`)을 제거하여 고유한 결과만 수집.
+
+### **4. GitHub Issues 생성**
 
 - 선택된 영상의 제목, 설명, 썸네일을 포함한 추천 영상을 GitHub Issues에 게시합니다.
-- 예시:
 
-  ```markdown
-  <img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="icon" width="18" height="18">
-  오늘의 추천 영상:
+#### **예시**:
 
-  <img src="https://img.youtube.com/vi/abcdef12345/hqdefault.jpg" alt="YouTube Thumbnail" width="320" height="180">
+```markdown
+<img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="icon" width="18" height="18">
+오늘의 추천 영상:
 
-  [LG 트윈스 vs 두산 베어스 하이라이트](https://www.youtube.com/watch?v=abcdef12345)
+<img src="https://img.youtube.com/vi/abcdef12345/hqdefault.jpg" alt="YouTube Thumbnail" width="320" height="180">
 
-  오늘 경기의 주요 장면을 확인하세요!
-  ```
+[LG 트윈스 vs 두산 베어스 하이라이트](https://www.youtube.com/watch?v=abcdef12345)
+
+오늘 경기의 주요 장면을 확인하세요!
+```
+
 <br>
 
 ## 🔧 **기여 방법**
@@ -146,6 +161,7 @@ on:
 
    - 응답 상태 코드와 에러 메시지를 확인하세요.
    - API 키가 유효한지 확인하세요.
+   - YouTube API 쿼터를 초과하지 않았는지 확인하세요.
 
 2. **GitHub Issues 생성 실패**
    - `GH_TOKEN`의 권한을 확인하세요.
