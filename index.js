@@ -11,6 +11,8 @@ const REPO = "github_power_actions_KBO";
 // GitHub Issue 생성 함수
 async function createGitHubIssue(title, body) {
   const url = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
+
+  console.log(`GitHub Issue 생성 요청: ${title}`);
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -20,6 +22,7 @@ async function createGitHubIssue(title, body) {
     body: JSON.stringify({ title, body }),
   });
 
+  console.log(`GitHub Issue 응답 상태 코드: ${response.status}`);
   if (response.ok) {
     console.log(`이슈 생성 성공: ${title}`);
   } else {
@@ -36,15 +39,23 @@ async function getTodayGames() {
   const day = String(today.getDate()).padStart(2, "0");
 
   const url = `https://api.sportradar.com/baseball/trial/v7/en/games/${year}/${month}/${day}/schedule.json?api_key=${SPORTRADAR_API_KEY}`;
+  console.log(`KBO API 요청 URL: ${url}`);
 
   try {
     const response = await fetch(url);
+    console.log(`KBO API 응답 상태 코드: ${response.status}`);
     if (!response.ok)
       throw new Error(`KBO API 요청 실패: ${response.statusText}`);
 
     const data = await response.json();
-    let summary = `오늘의 KBO 경기 결과:\n\n`;
+    console.log("KBO API 응답 데이터:", data);
 
+    if (!data.games || data.games.length === 0) {
+      console.log("오늘의 KBO 경기 결과가 없습니다.");
+      return;
+    }
+
+    let summary = `오늘의 KBO 경기 결과:\n\n`;
     data.games.forEach((game) => {
       summary += `${game.home.name} ${game.home.runs || 0} - ${
         game.away.runs || 0
@@ -56,7 +67,7 @@ async function getTodayGames() {
       summary
     );
   } catch (error) {
-    console.error(error.message);
+    console.error(`KBO 경기 결과 가져오기 실패: ${error.message}`);
   }
 }
 
@@ -65,15 +76,18 @@ async function getHighlightVideos(team) {
   const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
     team
   )}+하이라이트&key=${YOUTUBE_API_KEY}`;
+  console.log(`YouTube API 요청 URL: ${url}`);
 
   try {
     const response = await fetch(url);
+    console.log(`YouTube API 응답 상태 코드: ${response.status}`);
     if (!response.ok)
       throw new Error(`YouTube API 요청 실패: ${response.statusText}`);
 
     const data = await response.json();
-    const video = data.items[0];
+    console.log("YouTube API 응답 데이터:", data);
 
+    const video = data.items && data.items[0];
     if (video) {
       const videoLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
       const body = `오늘의 ${team} 하이라이트:\n\n[${video.snippet.title}](${videoLink})\n\n${video.snippet.description}`;
@@ -82,7 +96,7 @@ async function getHighlightVideos(team) {
       console.log(`${team} 하이라이트를 찾을 수 없습니다.`);
     }
   } catch (error) {
-    console.error(error.message);
+    console.error(`하이라이트 영상 가져오기 실패: ${error.message}`);
   }
 }
 
@@ -91,15 +105,18 @@ async function getPlayerProfile(playerName) {
   const url = `https://api.sportradar.com/baseball/trial/v7/en/players/${encodeURIComponent(
     playerName
   )}/profile.json?api_key=${SPORTRADAR_API_KEY}`;
+  console.log(`KBO 선수 프로필 API 요청 URL: ${url}`);
 
   try {
     const response = await fetch(url);
+    console.log(`KBO 선수 프로필 응답 상태 코드: ${response.status}`);
     if (!response.ok)
-      throw new Error(`KBO API 요청 실패: ${response.statusText}`);
+      throw new Error(`KBO 선수 프로필 요청 실패: ${response.statusText}`);
 
     const data = await response.json();
-    const player = data.player;
+    console.log("KBO 선수 프로필 응답 데이터:", data);
 
+    const player = data.player;
     if (player) {
       const profile = `
 이름: ${player.full_name}
@@ -109,13 +126,13 @@ async function getPlayerProfile(playerName) {
 - 타율: ${player.statistics.batting.avg}
 - 홈런: ${player.statistics.batting.hr}
 - 타점: ${player.statistics.batting.rbi}
-            `;
+      `;
       await createGitHubIssue(`${player.full_name} 선수의 프로필`, profile);
     } else {
       console.log(`${playerName} 선수 정보를 찾을 수 없습니다.`);
     }
   } catch (error) {
-    console.error(error.message);
+    console.error(`선수 프로필 가져오기 실패: ${error.message}`);
   }
 }
 
@@ -123,6 +140,9 @@ async function getPlayerProfile(playerName) {
 async function main() {
   const team = process.argv[2] || "LG 트윈스";
   const playerName = process.argv[3] || "홍창기";
+
+  console.log(`입력된 팀: ${team}`);
+  console.log(`입력된 선수: ${playerName}`);
 
   await getTodayGames();
   await getHighlightVideos(team);
