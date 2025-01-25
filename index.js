@@ -29,16 +29,19 @@ async function createGitHubIssue(title, body) {
     console.error(`이슈 생성 실패: ${title}`, error);
   }
 }
-
-// 추천 영상 가져오기 (nextPageToken 활용 및 검색 쿼리 개선)
+// 추천 영상 가져오기 (쿼리 다각화 및 날짜 범위 확장)
 async function getRecommendedVideo() {
-  const today = new Date().toISOString().split("T")[0]; // 오늘 날짜
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1); // 어제 날짜
-  const publishedAfter = yesterday.toISOString();
+  const today = new Date().toISOString().split("T")[0];
+  const lastWeek = new Date();
+  lastWeek.setDate(lastWeek.getDate() - 7); // 일주일 전
+  const publishedAfter = lastWeek.toISOString();
 
-  const baseQuery = `LG 트윈스 하이라이트`;
-  const specificQuery = `LG 트윈스 ${today}`; // 오늘 날짜 포함 쿼리
+  const alternativeQueries = [
+    `LG 트윈스 ${today}`,
+    "LG 트윈스 하이라이트",
+    "LG 트윈스 명장면",
+    "LG 트윈스 최신 경기",
+  ];
 
   const baseUrl = (query) =>
     `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
@@ -46,7 +49,7 @@ async function getRecommendedVideo() {
     )}&order=date&maxResults=50&publishedAfter=${publishedAfter}&key=${YOUTUBE_API_KEY}`;
 
   let nextPageToken = null;
-  let allItems = new Set(); // 중복 결과 방지
+  let allItems = new Set();
 
   // API 요청 로직
   async function fetchVideos(query) {
@@ -68,7 +71,6 @@ async function getRecommendedVideo() {
 
       if (data.items && data.items.length > 0) {
         data.items.forEach((item) => {
-          // 중복 확인 후 추가
           const videoId = item.id.videoId;
           if (videoId && !allItems.has(videoId)) {
             allItems.add(item);
@@ -76,23 +78,18 @@ async function getRecommendedVideo() {
         });
       }
 
-      nextPageToken = data.nextPageToken || null; // 다음 페이지 토큰 갱신
+      nextPageToken = data.nextPageToken || null;
     } while (nextPageToken);
   }
 
   try {
-    // 1. 구체적인 쿼리 시도
-    console.log("구체적인 쿼리 시도:", specificQuery);
-    await fetchVideos(specificQuery);
-
-    // 2. 검색 결과가 부족하면 기본 쿼리 시도
-    if (allItems.size === 0) {
-      console.log("기본 쿼리로 대체 시도:", baseQuery);
-      await fetchVideos(baseQuery);
+    // 여러 쿼리를 반복 실행
+    for (const query of alternativeQueries) {
+      console.log(`쿼리 시도: ${query}`);
+      await fetchVideos(query);
     }
 
     if (allItems.size > 0) {
-      // 랜덤으로 하나의 영상 선택
       const allVideosArray = Array.from(allItems);
       console.log("모든 영상 데이터:", Array.from(allItems));
 
@@ -101,7 +98,6 @@ async function getRecommendedVideo() {
       const videoLink = `https://www.youtube.com/watch?v=${video.id.videoId}`;
       const videoThumbnail = `https://img.youtube.com/vi/${video.id.videoId}/hqdefault.jpg`;
 
-      // 본문 구성
       const iconHtml = `<img src="https://i.namu.wiki/i/B9hIQukP-418N9W-5o6WddUuxmemYuBIZ65-xMHmRK4hDhipAtFQikphYYlBJ7lr3z0POdWs4n1azM-KOHe3qQ.svg" alt="icon" width="18" height="18">`;
       const body = `
 ${iconHtml} 오늘의 추천 영상:
