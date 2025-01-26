@@ -161,7 +161,7 @@ const publishedAfter = lastWeek.toISOString();
 
 ### 기본 스케줄
 
-`workflow.yaml` 파일에서 `cron` 값을 변경하여 실행 시간을 설정할 수 있습니다.
+`main.yaml` 파일에서 `cron` 값을 변경하여 실행 시간을 설정할 수 있습니다.
 
 - **예: 매일 한국 시간 정오(12:00)에 실행**
   ```yaml
