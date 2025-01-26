@@ -67,7 +67,7 @@ node index.js
 ### **2. GitHub Actions를 통한 자동화**
 
 - GitHub Actions는 설정된 스케줄(`cron`)에 따라 매일 정해진 시간에 스크립트를 실행합니다.
-- 기본 설정: **매일 정오(12:00 UTC)** 실행.
+- 기본 설정: **매일 정오(12:00 UTC 한국 기준 오후 9시시)** 실행.
 
 #### GitHub Actions 설정 확인:
 
